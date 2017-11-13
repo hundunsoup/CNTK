@@ -10,3 +10,7 @@ Support for Python 3.4 will be removed from CNTK releases later than v2.3.
 ## Performance
 ### Convolution with free static axes support
 -We have improved the training performance for models that use convolution operation with free static axes support. For certain models, we see training speed up of more than x5. 
+
+## Tensorboard
+### Removed Tensorboard image support
+ - The good thing is that now core CNTK library is not dependent on OpenCV anymore. CNTK will add Tensorboard image support again in the very next release.

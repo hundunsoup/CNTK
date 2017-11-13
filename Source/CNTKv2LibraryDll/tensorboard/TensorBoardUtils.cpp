@@ -261,30 +261,5 @@ namespace CNTK
                 placeholder.first->add_input(inputNode->name());
             }
         }
-
-    #ifndef CNTK_UWP
-
-        // Ensure OpenCV's imgproc library appears as direct dependency at link
-        // time so rpath will apply (Linux). // TODO find a better way
-        void _dummyRefForOpenCVImgProc()
-        {
-            cvThreshHist(0, 0.0);
-        }
-
-        void WriteImageToBuffer(void* matrix, int height, int weight, int dataType, std::vector<uchar>& buffer)
-        {
-            assert(matrix != nullptr);
-            assert(&buffer != nullptr);
-            vector<int> parameters = vector<int>(2);
-            parameters[0] = CV_IMWRITE_PNG_COMPRESSION;
-            parameters[1] = 3;//default(3)  0-9
-            cv::Mat source = cv::Mat(height, weight, dataType, matrix);
-
-            if (!imencode(".png", source, buffer, parameters)) {
-                fprintf(stderr, "TensorBoardFileWriter: PNG encoding failed. ");
-                return;
-            }
-        }
-    #endif // !CNTK_UWP
     }
 }
