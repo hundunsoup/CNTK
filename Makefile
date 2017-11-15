@@ -517,6 +517,8 @@ CNTKLIBRARY_SRC+=$(CNTK_COMMON_SRC)
 CNTKLIBRARY_SRC+=$(COMPUTATION_NETWORK_LIB_SRC)
 CNTKLIBRARY_SRC+=$(SEQUENCE_TRAINING_LIB_SRC)
 
+INCLUDEPATH += $(SOURCEDIR)/ImageWriterDll
+
 CNTKLIBRARY:=Cntk.Core-$(CNTK_COMPONENT_VERSION)
 
 CNTKLIBRARY_OBJ:=\
@@ -1004,6 +1006,42 @@ $(IMAGEREADER): $(IMAGEREADER_OBJ) | $(CNTKMATH_LIB)
 	@echo $(SEPARATOR)
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%, $(LIBDIR) $(LIBPATH)) $(patsubst %,$(RPATH)%, $(ORIGINDIR) $(LIBPATH)) -o $@ $^ -l$(CNTKMATH) $(IMAGEREADER_LIBS)
 endif
+endif
+
+########################################
+# ImageWriter plugin
+########################################
+
+ifdef OPENCV_PATH
+
+IMAGEWRITER_LIBS_LIST := opencv_core opencv_imgproc opencv_imgcodecs
+
+#ifdef LIBZIP_PATH
+#  CPPFLAGS += -DUSE_ZIP
+#  # Both directories are needed for building libzip
+#  INCLUDEPATH += $(LIBZIP_PATH)/include $(LIBZIP_PATH)/lib/libzip/include
+#  LIBPATH += $(LIBZIP_PATH)/lib
+#  IMAGEWRITER_LIBS_LIST += zip
+#endif
+
+IMAGEWRITER_LIBS:= $(addprefix -l,$(IMAGEWRITER_LIBS_LIST))
+
+IMAGEWRITER_SRC =\
+  $(SOURCEDIR)/ImageWriterDll/ImageWriter.cpp \
+
+IMAGEWRITER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(IMAGEWRITER_SRC))
+
+IMAGEWRITER:=$(LIBDIR)/Cntk.ImageWriter-$(CNTK_COMPONENT_VERSION).so
+ALL_LIBS += $(IMAGEWRITER)
+PYTHON_LIBS += $(IMAGEWRITER)
+SRC+=$(IMAGEWRITER_SRC)
+
+INCLUDEPATH += $(OPENCV_PATH)/include
+LIBPATH += $(OPENCV_PATH)/lib $(OPENCV_PATH)/release/lib
+
+$(IMAGEWRITER): $(IMAGEWRITER_OBJ)
+	@echo $(SEPARATOR)
+	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%, $(LIBDIR) $(LIBPATH)) $(patsubst %,$(RPATH)%, $(ORIGINDIR) $(LIBPATH)) -o $@ $^ $(IMAGEWRITER_LIBS)
 endif
 
 ########################################

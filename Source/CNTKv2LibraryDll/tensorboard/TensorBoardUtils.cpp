@@ -11,6 +11,7 @@
 #pragma warning(pop)
 
 #include "Utils.h"
+#include "Basics.h"
 
 namespace CNTK 
 {
@@ -261,5 +262,22 @@ namespace CNTK
                 placeholder.first->add_input(inputNode->name());
             }
         }
+
+    #ifndef CNTK_UWP
+        void WriteImageToBuffer(void* matrix, Microsoft::MSR::CNTK::DataType dtype, int height, int width, int depth, std::vector<unsigned char>& buffer)
+        {
+            typedef void(*EncodeImageAsPNG)(void* matrix, Microsoft::MSR::CNTK::DataType dataType, int height, int width, int depth, std::vector<unsigned char>& buffer);
+            static EncodeImageAsPNG encodeImageAsPNG = nullptr;
+
+            if (encodeImageAsPNG == nullptr)
+            {
+                Microsoft::MSR::CNTK::Plugin plugin;
+                encodeImageAsPNG = (EncodeImageAsPNG)plugin.Load(L"ImageWriter", "EncodeImageAsPNG");
+            }
+
+            encodeImageAsPNG(matrix, dtype, height, width, depth, buffer);
+        }
+
+    #endif // !CNTK_UWP
     }
 }
